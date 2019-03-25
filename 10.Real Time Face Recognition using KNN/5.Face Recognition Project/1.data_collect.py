@@ -29,7 +29,9 @@ while True:
     
     if ret==False:
         continue
-    faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
+    # faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
+    faces = face_cascade.detectMultiScale(frame, 1.3, 5)
+
     # Sort ascending using area (width * height)
     faces = sorted(faces, key=lambda face:face[2]*face[3])
 
@@ -46,7 +48,9 @@ while True:
         offset = 10
         # Using gray image to save space
         # y , x
-        face_section = gray_frame[y-offset:y+h+offset, x-offset:x+w+offset]
+        # face_section = gray_frame[y-offset:y+h+offset, x-offset:x+w+offset]
+        # Training using color frame
+        face_section = frame[y-offset:y+h+offset, x-offset:x+w+offset]
         # Resize in 100x100 grid
         face_section = cv2.resize(face_section,(100,100))
 

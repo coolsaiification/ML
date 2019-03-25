@@ -70,6 +70,7 @@ for fx in os.listdir(dataset_path):
         class_id += 1
         labels.append(target)
 
+print(len(face_data[1][0]),len(face_data[0][0]))
 face_data = np.concatenate(face_data, axis=0)
 labels = np.concatenate(labels, axis=0).reshape((-1,1))
 print(face_data.shape)
@@ -85,21 +86,25 @@ while True:
     if ret==False:
         continue
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
+    # faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
+    faces = face_cascade.detectMultiScale(frame, 1.3, 5)
 
     for (x,y,w,h) in faces:
+        try:
+            # Get face ROI (Region Of Interest)
+            offset = 10
+            # face_section = gray_frame[y-offset:y+h+offset, x-offset: x+w+offset]
+            face_section = frame[y-offset:y+h+offset, x-offset: x+w+offset]
+            face_section = cv2.resize(face_section, (100,100))
 
-        # Get face ROI (Region Of Interest)
-        offset = 10
-        face_section = gray_frame[y-offset:y+h+offset, x-offset: x+w+offset]
-        face_section = cv2.resize(face_section, (100,100))
+            out = knn(train_set, face_section.flatten())
 
-        out = knn(train_set, face_section.flatten())
-
-        # Display name and rectange
-        pred_name = names[int(out)]
-        cv2.putText(frame, pred_name, (x,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
-        cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,255), 2)
+            # Display name and rectange
+            pred_name = names[int(out)]
+            cv2.putText(frame, pred_name, (x,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+            cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,255), 2)
+        except Exception as e:
+            print(e)
 
     cv2.imshow("Faces", frame)
 
